@@ -7,14 +7,17 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_image.h>
 #define GAME_TERMINATE -1
+
 enum KEYS{ UP, DOWN, LEFT, RIGHT};
 
 ALLEGRO_DISPLAY* display = NULL;
 ALLEGRO_FONT* font = NULL;
-ALLEGRO_BITMAP* img = NULL;
+ALLEGRO_BITMAP* player = NULL;
 ALLEGRO_BITMAP* bg = NULL;
 ALLEGRO_BITMAP* title = NULL;
 ALLEGRO_BITMAP* papa = NULL;
+ALLEGRO_BITMAP* shadow = NULL;
+ALLEGRO_BITMAP* titlejohnny = NULL;
 ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 
 typedef struct character
@@ -32,10 +35,12 @@ const int width = 1280;
 const int height = 720;
 int window = 1;
 bool next_window = false;
-    bool done = false;
-	int pos_x = width / 2;
-	int pos_y = height / 2;
-    bool keys[4] = {false, false, false, false};
+bool done = false;
+int pos_x = width / 2;
+int pos_y = height / 2;
+int dir;
+bool keys[4] = {false, false, false, false};
+
 
 void show_err_msg(int msg);
 void game_init();
@@ -51,7 +56,7 @@ int main(int argc, char *argv[])
     int msg = 0;
 
     printf("Loading...\n");
-    al_rest(1);
+    //al_rest(1);
 
     game_init();
     game_begin();
@@ -102,17 +107,20 @@ void game_init()
 void game_begin()
 {
     ALLEGRO_COLOR al_map_rgb(unsigned char r, unsigned char g, unsigned char b);
-    font = al_load_ttf_font("Wildy-Sans.ttf", 15, 0);
-    //al_clear_to_color(al_map_rgb(0,0,0));
-    img = al_load_bitmap("johnny.png");
-    al_draw_bitmap(img,0, 0, 0); //for character
+    font = al_load_ttf_font("Wildy-Sans.ttf", 40, 0);
+    player = al_load_bitmap("spritejohnny.png");
+    al_draw_bitmap(player,0, 0, 0); //for character
     bg = al_load_bitmap("title_bg.png");
     title = al_load_bitmap("title.png");
+    shadow = al_load_bitmap("shadow.png");
     papa = al_load_bitmap("papa.png");
+    titlejohnny = al_load_bitmap("title_johnny.png");
     al_draw_bitmap(bg, 0, 0, 0);
-    al_draw_bitmap(title, 0, 0, 0);
-    al_draw_bitmap(papa, 0, 0, 0);
-    al_draw_text(font,al_map_rgb(218,240,238),width,height,ALLEGRO_ALIGN_CENTER,"PRESS ENTER TO START");
+    al_draw_bitmap(shadow, 55, 10, 0);
+    al_draw_bitmap(papa, 150, 0, 0);
+    al_draw_bitmap(title, 500, 250, 0);
+    al_draw_bitmap(titlejohnny, 220, 350, 0);
+    al_draw_text(font,al_map_rgb(255,255,255),800,500,0,"press enter to start");
     al_flip_display();
 
 }
@@ -132,15 +140,19 @@ int process_event()
 			{
 				case ALLEGRO_KEY_UP:
 					keys[UP] = true;
+					dir = UP;
 					break;
 				case ALLEGRO_KEY_DOWN:
 					keys[DOWN] = true;
+					dir = DOWN;
 					break;
 				case ALLEGRO_KEY_RIGHT:
 					keys[RIGHT] = true;
+					dir = RIGHT;
 					break;
 				case ALLEGRO_KEY_LEFT:
 					keys[LEFT] = true;
+					dir = LEFT;
 					break;
                 case ALLEGRO_KEY_ESCAPE:
                     return GAME_TERMINATE;
@@ -196,7 +208,7 @@ int game_run()
                 // Setting Character
                 character1.x = width / 2;
                 character1.y = height / 2 + 150;
-                character1.image_path = img;
+                character1.image_path = player;
                 bg = al_load_bitmap("title_bg.png");
 
                 //Initialize Timer
@@ -241,8 +253,9 @@ void game_destroy()
 {
     al_destroy_display(display);
     al_destroy_font(font);
-    al_destroy_bitmap(img);
+    al_destroy_bitmap(player);
     al_destroy_bitmap(papa);
     al_destroy_bitmap(title);
     al_destroy_bitmap(bg);
+    al_destroy_bitmap(titlejohnny);
 }
